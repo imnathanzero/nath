@@ -3,7 +3,7 @@
 [**Download Disini**](https://github.com/imnathanzero/nath/releases)
 
 Screenshots :
-- [**LineageOS 19.1**](https://github.com/imnathanzero/nath/releases/tag/2)
+- [**LineageOS 19.1**](https://github.com/imnathanzero/nath/releases/latest)
 
 ![Screenshot_20241007-073517_Settings](https://github.com/user-attachments/assets/4817d566-d9fc-45c7-b433-0e82db4ac9f4)
 ![Screenshot_20241007-073506_Settings](https://github.com/user-attachments/assets/5fdedd6a-8d59-4da4-b678-14303739f795)
