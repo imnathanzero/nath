@@ -1,4 +1,4 @@
-[image-1]: https://tenor.com/view/lain-serial-experiments-lain-gif-26108112
+![giphy](https://github.com/user-attachments/assets/2ad40b3f-8a40-48e8-9363-eb3cd85cbe36)
 
 [**Download Disini**](https://github.com/imnathanzero/nath/releases)
 
