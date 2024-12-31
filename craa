@@ -12,5 +12,5 @@ export BUILD_USERNAME=nathan
 export BUILD_HOSTNAME=daddygaming00
 export TZ=Asia/Jakarta
 
-lunch lineage_RMX1941-ap2a-userdebug
+lunch lineage_RMX1941-ap3a-userdebug
 m bacon -j$(nproc --all)
