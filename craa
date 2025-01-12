@@ -1,10 +1,10 @@
 sudo apt-get update -y && sudo apt-get -qq install dialog bash sed wget git curl zip tar jq expect make cmake automake autoconf llvm lld lldb clang gcc binutils bison perl gperf gawk flex bc python3 zstd openssl unzip cpio bc bison build-essential liblz4-tool libsdl1.2-dev libstdc++6 libxml2 libxml2-utils lzop pngcrush schedtool squashfs-tools xsltproc zlib1g-dev libncurses5-dev bzip2 git gcc g++ libssl-dev gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-arm-linux-gnueabi dos2unix kmod -y
 rm -rf .repo/local_manifests/
 
-repo init -u https://github.com/LineageOS/android.git -b lineage-22.0 --git-lfs
+repo init -u https://github.com/Project-Awaken/android_manifest -b triton --git-lfs
 /opt/crave/resync.sh
 
-git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b u-wip device/realme/RMX1941
+git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b awaken-13 device/realme/RMX1941
 
 source build/env*.sh
 
@@ -12,5 +12,5 @@ export BUILD_USERNAME=nathan
 export BUILD_HOSTNAME=daddygaming00
 export TZ=Asia/Jakarta
 
-lunch lineage_RMX1941-ap3a-userdebug
-m bacon -j$(nproc --all)
+lunch awaken_RMX1941-userdebug
+make bacon -j$(nproc --all)
