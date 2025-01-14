@@ -3,7 +3,9 @@ rm -rf .repo/local_manifests/
 repo init -u https://github.com/ArrowOS-Extended/android_manifest.git -b arrow-13.1 --git-lfs
 /opt/crave/resync.sh
 
-rm -rf device/realme/RMX1941;git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b arrow-13 device/realme/RMX1941
+rm -rf device/realme/RMX1941
+
+git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b arrow-13 device/realme/RMX1941
 
 source build/env*.sh
 
