@@ -1,11 +1,11 @@
-# rm -rf .repo/local_manifests/
+rm -rf .repo/local_manifests/
 
-# repo init -u https://github.com/ArrowOS-Extended/android_manifest.git -b arrow-13.1 --git-lfs
-# /opt/crave/resync.sh
+repo init -u https://github.com/Havoc-OS/android_manifest.git -b ten
+/opt/crave/resync.sh
 
 rm -rf device/realme/RMX1941
 
-git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b arrow-13 device/realme/RMX1941
+git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b havoc-10 device/realme/RMX1941
 
 source build/env*.sh
 
@@ -13,6 +13,4 @@ export BUILD_USERNAME=nathan
 export BUILD_HOSTNAME=daddygaming00
 export TZ=Asia/Jakarta
 
-lunch arrow_RMX1941-userdebug
-# m bacon -j$(nproc --all)
-ota_sign
+brunch RMX1941
