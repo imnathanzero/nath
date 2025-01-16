@@ -1,5 +1,3 @@
-rm -rf .repo
-
 repo init -u https://github.com/imnathanzero/android_manifest_havoc.git -b ten
 /opt/crave/resync.sh
 
