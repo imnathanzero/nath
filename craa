@@ -1,6 +1,6 @@
-rm -rf .repo/local_manifests/
+rm -rf .repo
 
-repo init -u https://github.com/Havoc-OS/android_manifest.git -b ten
+repo init -u https://github.com/imnathanzero/android_manifest_havoc.git -b ten
 /opt/crave/resync.sh
 
 rm -rf device/realme/RMX1941
