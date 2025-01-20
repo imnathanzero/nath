@@ -1,14 +1,15 @@
-repo init -u https://github.com/imnathanzero/android_manifest_havoc.git -b ten
+repo init -u https://github.com/ArrowOS-T/android_manifest.git -b arrow-13.1_ext
 /opt/crave/resync.sh
 
 rm -rf device/realme/RMX1941
 
-git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b havoc-10 device/realme/RMX1941
+git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b arrow-T_ext device/realme/RMX1941
 
-source build/env*.sh
+. build/env*.sh
 
 export BUILD_USERNAME=nathan
-export BUILD_HOSTNAME=daddygaming00
+export BUILD_HOSTNAME=thickdaddy27
 export TZ=Asia/Jakarta
 
-brunch RMX1941
+lunch arrow_RMX1941-userdebug
+m bacon
