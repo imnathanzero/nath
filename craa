@@ -1,9 +1,9 @@
-repo init -u https://github.com/ArrowOS-T/android_manifest.git -b arrow-13.1_ext
+repo init -u https://github.com/xdCLO/xd_manifest -b eleven
 /opt/crave/resync.sh
 
 rm -rf device/realme/RMX1941
 
-git clone https://github.com/imnathanzero/android_device_realme_RMX1941 -b arrow-T_ext device/realme/RMX1941
+git clone https://github.com/nathanzerogarage/device_realme_RMX1941.git -b eleven device/realme/RMX1941
 
 . build/env*.sh
 
@@ -11,5 +11,5 @@ export BUILD_USERNAME=nathan
 export BUILD_HOSTNAME=thickdaddy27
 export TZ=Asia/Jakarta
 
-lunch arrow_RMX1941-userdebug
-m bacon
+lunch xdroid_RMX1941-userdebug
+make xd
