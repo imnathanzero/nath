@@ -1,9 +1,9 @@
-repo init -u https://github.com/xdCLO/xd_manifest -b eleven
-/opt/crave/resync.sh
+# repo init -u https://github.com/xdCLO/xd_manifest -b eleven
+# /opt/crave/resync.sh
 
-rm -rf device/realme/RMX1941
+# rm -rf device/realme/RMX1941
 
-git clone https://github.com/nathanzerogarage/device_realme_RMX1941.git -b eleven device/realme/RMX1941
+# git clone https://github.com/nathanzerogarage/device_realme_RMX1941.git -b eleven device/realme/RMX1941
 
 . build/env*.sh
 
