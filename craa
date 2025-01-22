@@ -1,9 +1,9 @@
-# repo init -u https://github.com/xdCLO/xd_manifest -b eleven
-# /opt/crave/resync.sh
+repo init -u https://github.com/LineageOS-Revived/android.git -b lineage-18.1 --git-lfs
+/opt/crave/resync.sh
 
-# rm -rf device/realme/RMX1941
+rm -rf device/realme/RMX1941
 
-# git clone https://github.com/nathanzerogarage/device_realme_RMX1941.git -b eleven device/realme/RMX1941
+git clone https://github.com/nathanzerogarage/device_realme_RMX1941.git -b eleven device/realme/RMX1941
 
 . build/env*.sh
 
@@ -11,5 +11,5 @@ export BUILD_USERNAME=nathan
 export BUILD_HOSTNAME=thickdaddy27
 export TZ=Asia/Jakarta
 
-lunch xdroid_RMX1941-userdebug
-make xd
+lunch lineage_RMX1941-userdebug
+mka bacon
