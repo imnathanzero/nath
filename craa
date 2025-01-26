@@ -1,9 +1,9 @@
-# repo init -u https://github.com/crdroidandroid/android.git -b 11.0 --git-lfs
-# /opt/crave/resync.sh
+repo init -u https://github.com/ResurrectionRemix-Revived/manifest.git -b Q --git-lfs
+/opt/crave/resync.sh
 
 rm -rf device/realme/RMX1941
 
-git clone https://github.com/nathanzerogarage/device_realme_RMX1941.git -b eleven device/realme/RMX1941
+git clone https://github.com/imnathanzero/android_device_realme_RMX1941.git -b rr-10 device/realme/RMX1941
 
 . build/env*.sh
 
@@ -11,5 +11,5 @@ export BUILD_USERNAME=nathan
 export BUILD_HOSTNAME=thickdaddy27
 export TZ=Asia/Jakarta
 
-make clean
-brunch RMX1941
+lunch rr_RMX1941-userdebug
+m bacon
