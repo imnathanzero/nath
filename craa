@@ -1,9 +1,9 @@
-repo init -u https://github.com/ResurrectionRemix-Revived/manifest.git -b Q --git-lfs
+repo init -u https://github.com/Spark-Rom/manifest -b pyro
 /opt/crave/resync.sh
 
 rm -rf device/realme/RMX1941
 
-git clone https://github.com/imnathanzero/android_device_realme_RMX1941.git -b rr-10 device/realme/RMX1941
+git clone https://github.com/imnathanzero/android_device_realme_RMX1941.git -b spark-13 device/realme/RMX1941
 
 . build/env*.sh
 
@@ -11,5 +11,5 @@ export BUILD_USERNAME=nathan
 export BUILD_HOSTNAME=thickdaddy27
 export TZ=Asia/Jakarta
 
-lunch rr_RMX1941-userdebug
-m bacon
+lunch spark_RMX1941-userdebug
+mka bacon
