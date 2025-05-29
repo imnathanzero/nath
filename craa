@@ -8,5 +8,5 @@ git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite.git -b
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-lunch lineage_tanzanite-user
+lunch lineage_tanzanite-bp1a-user
 m bacon
