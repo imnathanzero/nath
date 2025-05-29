@@ -1,14 +1,12 @@
-repo init -u https://github.com/LineageOS/android.git -b lineage-20.0 --git-lfs
+repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
 /opt/crave/resync.sh
 
-rm -rf device/realme/RMX1941
-git clone https://github.com/imnathanzero/android_device_realme_RMX1941.git -b backup-tree device/realme/RMX1941
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite.git -b fifteen device/xiaomi/tanzanite
 
-. build/env*.sh
+. build/env*
 
 export BUILD_USERNAME=nathan
-export BUILD_HOSTNAME=thickdaddy27
 export TZ=Asia/Jakarta
 
-lunch lineage_RMX1941-userdebug
+lunch lineage_tanzanite-user
 m bacon
