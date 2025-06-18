@@ -1,12 +1,26 @@
-# repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
-# /opt/crave/resync.sh
+repo init -u https://github.com/RisingOS-Revived/android -b qpr2 --git-lfs
+/opt/crave/resync.sh
 
-# git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite.git -b fifteen device/xiaomi/tanzanite
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
+
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite-kernel device/xiaomi/tanzanite-kernel
+
+git clone https://github.com/imnathanzero/proprietary_vendor_xiaomi_tanzanite vendor/xiaomi/tanzanite
+
+git clone https://github.com/LineageOS/android_hardwwre_lineage_compat -b lineage-22.2 hardware/lineage/compat
+
+git clone https://github.com/LineageOS/android_hardware_xiaomi -b lineage-22.2 hardware/xiaomi
+
+git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
+
+git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr
 
 . build/env*
+
+export RISING_MAINTAINER="nathan"
 
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-lunch lineage_tanzanite-bp1a-user
-m bacon
+riseup tanzanite userdebug
+rise b
