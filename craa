@@ -1,5 +1,5 @@
-repo init -u https://github.com/RisingOS-Revived/android -b qpr2 --git-lfs
-/opt/crave/resync.sh
+# repo init -u https://github.com/RisingOS-Revived/android -b qpr2 --git-lfs
+# /opt/crave/resync.sh
 
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
 
