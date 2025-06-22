@@ -17,8 +17,6 @@ git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b 
 
 . build/env*
 
-export GENESIS_MAINTAINER=nathan
-
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
