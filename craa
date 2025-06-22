@@ -1,5 +1,5 @@
-repo init -u https://github.com/GenesisOS/manifest.git -b verve-qpr2 --git-lfs
-/opt/crave/resync.sh
+# repo init -u https://github.com/GenesisOS/manifest.git -b verve-qpr2 --git-lfs
+# /opt/crave/resync.sh
 
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2-dolby device/xiaomi/tanzanite
 
@@ -23,4 +23,4 @@ export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
 breakfast tanzanite
-# mka genesis
+mka genesis
