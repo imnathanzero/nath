@@ -1,7 +1,7 @@
 repo init --no-repo-verify --git-lfs -u https://github.com/ProjectInfinity-X/manifest -b 15 -g default,-mips,-darwin,-notdefault
 /opt/crave/resync.sh
 
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b infinity-15 device/xiaomi/tanzanite
 
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite-kernel device/xiaomi/tanzanite-kernel
 
@@ -21,4 +21,4 @@ export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
 lunch infinity_tanzanite-user
-# mka bacon
+mka bacon
