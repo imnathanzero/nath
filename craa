@@ -1,11 +1,11 @@
-# repo init -u https://github.com/GenesisOS/manifest.git -b verve-qpr2 --git-lfs
-# /opt/crave/resync.sh
+repo init --no-repo-verify --git-lfs -u https://github.com/ProjectInfinity-X/manifest -b 15 -g default,-mips,-darwin,-notdefault
+/opt/crave/resync.sh
 
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2-dolby device/xiaomi/tanzanite
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
 
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite-kernel device/xiaomi/tanzanite-kernel
 
-git clone https://github.com/imnathanzero/proprietary_vendor_xiaomi_tanzanite vendor/xiaomi/tanzanite
+git clone https://github.com/imnathanzero/proprietary_vendor_xiaomi_tanzanite -b lineage-22.2 vendor/xiaomi/tanzanite
 
 git clone https://github.com/LineageOS/android_hardware_lineage_compat -b lineage-22.2 hardware/lineage/compat
 
@@ -20,5 +20,5 @@ git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b 
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-breakfast tanzanite
-mka genesis
+lunch infinity_tanzanite-user
+# mka bacon
