@@ -1,8 +1,8 @@
 # repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
 # /opt/crave/resync.sh
 
-rm -rf device/xiaomi/tanzanite
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
+# rm -rf device/xiaomi/tanzanite
+# git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
 
 . build/env*
 
