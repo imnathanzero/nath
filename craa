@@ -13,4 +13,4 @@ export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
 lunch lineage_tanzanite-bp1a-userdebug
-m bacon
+# m bacon
