@@ -1,13 +1,11 @@
-# repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
-# /opt/crave/resync.sh
+repo init -u https://github.com/HorizonV2/android.git -b lineage-22.2 --git-lfs
+/opt/crave/resync.sh
 
-# if [ -d "device/xiaomi/tanzanite" ]; then
-#     rm -rf "device/xiaomi/tanzanite"
-# fi
+if [ -d "device/xiaomi/tanzanite" ]; then
+     rm -rf "device/xiaomi/tanzanite"
+fi
 
-# git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
-
-rm device/xiaomi/tanzanite/vendorsetup.sh
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
 
 . build/env*
 
