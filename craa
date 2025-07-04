@@ -1,27 +1,16 @@
-repo init -u https://github.com/HorizonV2/android.git -b lineage-22.2 --git-lfs
-/opt/crave/resync.sh
+# repo init -u https://github.com/HorizonV2/android.git -b lineage-22.2 --git-lfs
+# /opt/crave/resync.sh
 
-if [ -d "device/xiaomi/tanzanite" ]; then
-     rm -rf "device/xiaomi/tanzanite"
-fi
+# if [ -d "device/xiaomi/tanzanite" ]; then
+#      rm -rf "device/xiaomi/tanzanite"
+# fi
 
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
+# git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
 
 . build/env*
 
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
-
-export HORIZON_MAINTAINER=nathan
-
-export TARGET_FACE_UNLOCK_SUPPORTED=true
-
-export WITH_GMS=false
-
-export TARGET_INCLUDE_MATLOG=false
-export TARGET_INCLUDE_ACCORD=true
-export TARGET_PREBUILT_BCR=false
-export PRODUCT_NO_CAMERA=false
 
 lunch lineage_tanzanite-bp1a-userdebug
 mka horizon
