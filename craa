@@ -9,6 +9,8 @@ git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lin
 
 . build/env*
 
+export WITH_GMS=false
+
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
