@@ -9,8 +9,9 @@ fi
 
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2_experimental device/xiaomi/tanzanite
 
-mkdir -p overlay/packages/apps/Settings/res/values
-touch overlay/packages/apps/Settings/res/values/strings.xml
+rm overlay/packages/apps/Settings/res/values/strings.xml
+mkdir -p device/xiaomi/tanzanite/overlay/packages/apps/Settings/res/values
+touch device/xiaomi/tanzanite/overlay/packages/apps/Settings/res/values/strings.xml
 echo "<?xml version="1.0" encoding="utf-8"?>
 <
      Copyright (C) 2025 Project Matrixx
@@ -19,7 +20,7 @@ echo "<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     < Android version screen, build maintainer -->
     <string name="matrixx_maintainer">nathan</string>
-</resources>" >> overlay/packages/apps/Settings/res/values/strings.xml
+</resources>" >> device/xiaomi/tanzanite/overlay/packages/apps/Settings/res/values/strings.xml
 
 . build/env*
 
