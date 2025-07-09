@@ -7,7 +7,15 @@ if [ -d "device/xiaomi/tanzanite" ]; then
    rm -rf "device/xiaomi/tanzanite"
 fi
 
+if [ -d "vendor/xiaomi/tanzanite" ]; then
+   rm -rf "vendor/xiaomi/tanzanite"
+fi
+
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2_experimental device/xiaomi/tanzanite
+
+git clone https://github.com/imnathanzero/proprietary_vendor_xiaomi_tanzanite -b lineage-22.2_experimental vendor/xiaomi/tanzanite
+
+rm device/xiaomi/tanzanite/vendorsetup.sh
 
 rm overlay/packages/apps/Settings/res/values/strings.xml
 mkdir -p device/xiaomi/tanzanite/overlay/packages/apps/Settings/res/values
