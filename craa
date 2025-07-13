@@ -9,7 +9,6 @@ if [ -d "device/xiaomi/tanzanite" ]; then
 fi
 
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
-rm device/xiaomi/tanzanite/vendorsetup.sh
 
 . build/env*
 
