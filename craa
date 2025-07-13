@@ -1,8 +1,8 @@
 #!/bin/bash
 
-repo init -u https://github.com/lain-los/android.git -b lineage-22.2 --git-lfs
-rm -rf prebuilts/clang/host/linux-x86
-/opt/crave/resync.sh
+# repo init -u https://github.com/lain-los/android.git -b lineage-22.2 --git-lfs
+# rm -rf prebuilts/clang/host/linux-x86
+# /opt/crave/resync.sh
 
 if [ -d "device/xiaomi/tanzanite" ]; then
    rm -rf "device/xiaomi/tanzanite"
