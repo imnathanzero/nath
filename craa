@@ -7,10 +7,6 @@ if [ -d "device/xiaomi/tanzanite" ]; then
    rm -rf "device/xiaomi/tanzanite"
 fi
 
-if [ -d "vendor/xiaomi/tanzanite" ]; then
-   rm -rf "vendor/xiaomi/tanzanite"
-fi
-
 rm device/xiaomi/tanzanite/vendorsetup.sh
 
 . build/env*
