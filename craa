@@ -4,12 +4,13 @@
 # rm -rf prebuilts/clang/host/linux-x86
 # /opt/crave/resync.sh
 
-if [ -d "device/xiaomi/tanzanite" ]; then
-   rm -rf "device/xiaomi/tanzanite"
-fi
+# if [ -d "device/xiaomi/tanzanite" ]; then
+#    rm -rf "device/xiaomi/tanzanite"
+# fi
 
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
+# git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
 
+rm device/xiaomi/tanzanite/vendorsetup.sh
 . build/env*
 
 export BUILD_USERNAME=nathan
