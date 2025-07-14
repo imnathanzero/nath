@@ -2,6 +2,7 @@
 
 repo init -u https://github.com/lain-los/android.git -b lineage-22.2 --git-lfs
 rm -rf prebuilts/clang/host/linux-x86
+rm -rf hardware/lineage/compat
 /opt/crave/resync.sh
 
 # if [ -d "device/xiaomi/tanzanite" ]; then
