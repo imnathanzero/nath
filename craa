@@ -1,7 +1,7 @@
 #!/bin/bash
 
-repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
-/opt/crave/resync.sh
+# repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
+# /opt/crave/resync.sh
 
 if [ -d "device/xiaomi/tanzanite" ]; then
    rm -rf "device/xiaomi/tanzanite"
@@ -9,11 +9,12 @@ fi
 
 git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2-dolby device/xiaomi/tanzanite
 
+rm -rf out/target
+
 . build/env*
 
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-. build/envsetup.sh
 lunch lineage_tanzanite-bp1a-userdebug
 m bacon
