@@ -1,6 +1,6 @@
 #!/bin/bash
 
-repo init -u https://github.com/ProjectMatrixx/android.git -b 15.0 --git-lfs
+repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
 /opt/crave/resync.sh
 
 if [ -d "device/xiaomi/tanzanite" ]; then
@@ -15,4 +15,5 @@ export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
 . build/envsetup.sh
-brunch tanzanite userdebug
+lunch lineage_tanzanite-bp1a-userdebug
+m bacon
