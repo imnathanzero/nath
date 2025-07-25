@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
-# /opt/crave/resync.sh
+repo init -u https://github.com/genesis-fork/manifest.git -b verve-qpr2 --git-lfs
+/opt/crave/resync.sh
 
 if [ -d "device/xiaomi/tanzanite" ]; then
    rm -rf "device/xiaomi/tanzanite"
 fi
 
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2-dolby device/xiaomi/tanzanite
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
 
 rm -rf out/target
 
@@ -16,5 +16,5 @@ rm -rf out/target
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-lunch lineage_tanzanite-bp1a-userdebug
-m bacon
+breakfast tanzanite userdebug
+# mka genesis
