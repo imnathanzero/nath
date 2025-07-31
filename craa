@@ -1,13 +1,19 @@
 #!/bin/bash
 
-repo init -u https://github.com/genesis-fork/manifest.git -b verve-qpr2 --git-lfs
+repo init -u https://github.com/los-nx/android.git -b lineage-22.2 --git-lfs
 /opt/crave/resync.sh
 
 if [ -d "device/xiaomi/tanzanite" ]; then
    rm -rf "device/xiaomi/tanzanite"
 fi
 
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b lineage-22.2-dolby device/xiaomi/tanzanite
+git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite-kernel device/xiaomi/tanzanite-kernel
+git clone https://github.com/imnathanzero/proprietary_vendor_xiaomi_tanzanite -b lineage-22.2-dolby vendor/xiaomi/tanzanite
+git clone https://github.com/LineageOS/android_hardware_lineage_compat -b lineage-22.2 hardware/lineage/compat
+git clone https://github.com/xiaomi-mediatek-devs/android_hardware_xiaomi -b lineage-22.2 hardware/xiaomi
+git clone https://github.com/xiaomi-mediatek-devs/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
+git clone https://github.com/xiaomi-mediatek-devs/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr
 
 rm -rf out/target
 
@@ -16,5 +22,5 @@ rm -rf out/target
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-breakfast tanzanite userdebug
-# mka genesis
+lunch lineage_tanzanite-bp1a-userdebug
+mka bacon
