@@ -1,0 +1,41 @@
+commit e13e689909239f5d945c24fd1cade3927cad2133
+Author: Nathan Andrew <nathannxx@proton.me>
+Date:   Sun Aug 31 06:44:50 2025 +0700
+
+    LH7n: add nuke-gapps
+    for nuking some of useless gapps packages
+    
+    Signed-off-by: Nathan Andrew <nathannxx@proton.me>
+
+diff --git a/device.mk b/device.mk
+index 8bcfd52..3f6980e 100644
+--- a/device.mk
++++ b/device.mk
+@@ -308,6 +308,10 @@ PRODUCT_PACKAGES += \
+     com.android.nfc_extras \
+     Tag
+ 
++# nuke-apps
++PRODUCT_PACKAGES += \
++    nuke-apps
++
+ # Overlays
+ PRODUCT_ENFORCE_RRO_TARGETS := *
+ PRODUCT_PACKAGES += \
+diff --git a/nuke-apps/Android.mk b/nuke-apps/Android.mk
+new file mode 100644
+index 0000000..41b6389
+--- /dev/null
++++ b/nuke-apps/Android.mk
+@@ -0,0 +1,10 @@
++LOCAL_PATH := $(call my-dir)
++include $(CLEAR_VARS)
++LOCAL_MODULE := nuke-apps
++LOCAL_MODULE_CLASS := APPS
++LOCAL_MODULE_TAGS := optional
++LOCAL_OVERRIDES_PACKAGES := DevicePolicyPrebuilt Maps MyVerizonServices SafetyHubPrebuilt ScribePrebuilt Showcase YouTube YouTubeMusicPrebuilt obdm_stub Snap GoogleTTS LocationHistoryPrebuilt MarkupGoogle PrebuiltGmail talkback Videos Chrome-Stub Chrome Chrome64 PartnerSetupPrebuilt
++LOCAL_UNINSTALLABLE_MODULE := true
++LOCAL_CERTIFICATE := PRESIGNED
++LOCAL_SRC_FILES := /dev/null
++include $(BUILD_PREBUILT)
+\ No newline at end of file
