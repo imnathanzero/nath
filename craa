@@ -1,8 +1,8 @@
 #!/bin/bash
 
-rm -rf .repo/local_manifests device/xiaomi/tanzanite* vendor/xiaomi/tanzanite hardware/mediatek
+rm -rf .repo/local_manifests
 git clone https://github.com/imnathanzero/local_manifests_tanzanite.git -b 15 .repo/local_manifests
-repo init -u https://github.com/los-nx/android.git -b lineage-22.2 --git-lfs
+# repo init -u https://github.com/los-nx/android.git -b lineage-22.2 --git-lfs
 /opt/crave/resync.sh
 
 rm -rf out/target
