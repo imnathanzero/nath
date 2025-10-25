@@ -1,23 +1,23 @@
 #!/bin/bash
 
-repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.0 --git-lfs
-/opt/crave/resync.sh
+# repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.0 --git-lfs
+# /opt/crave/resync.sh
 
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b axion-16 device/xiaomi/tanzanite
-git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite-kernel -b lineage-22.2-mahiru device/xiaomi/tanzanite-kernel
-git clone https://github.com/imnathanzero/proprietary_vendor_xiaomi_tanzanite -b lineage-23.0 vendor/xiaomi/tanzanite
-git clone https://github.com/TogoFire/packages_apps_ViPER4AndroidFX.git -b v4a packages/apps/ViPER4AndroidFX
-git clone https://github.com/LineageOS/android_hardware_lineage_compat -b lineage-23.0 hardware/lineage/compat
-git clone https://github.com/imnathanzero/android_hardware_xiaomi -b lineage-23.0 hardware/xiaomi
-git clone https://github.com/imnathanzero/android_hardware_mediatek -b lineage-23.0 hardware/mediatek
-git clone https://github.com/imnathanzero/android_device_mediatek_sepolicy_vndr -b lineage-23.0 device/mediatek/sepolicy_vndr
+# git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite -b axion-16 device/xiaomi/tanzanite
+# git clone https://github.com/imnathanzero/android_device_xiaomi_tanzanite-kernel -b lineage-22.2-mahiru device/xiaomi/tanzanite-kernel
+# git clone https://github.com/imnathanzero/proprietary_vendor_xiaomi_tanzanite -b lineage-23.0 vendor/xiaomi/tanzanite
+# git clone https://github.com/TogoFire/packages_apps_ViPER4AndroidFX.git -b v4a packages/apps/ViPER4AndroidFX
+# git clone https://github.com/LineageOS/android_hardware_lineage_compat -b lineage-23.0 hardware/lineage/compat
+# git clone https://github.com/imnathanzero/android_hardware_xiaomi -b lineage-23.0 hardware/xiaomi
+# git clone https://github.com/imnathanzero/android_hardware_mediatek -b lineage-23.0 hardware/mediatek
+# git clone https://github.com/imnathanzero/android_device_mediatek_sepolicy_vndr -b lineage-23.0 device/mediatek/sepolicy_vndr
 
-# rm -rf out/target
+rm -rf out/target
 
 . build/env*
 
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-axion tanzanite userdebug gms pico 
+axion tanzanite userdebug gms pico
 ax -br
