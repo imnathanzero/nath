@@ -1,6 +1,8 @@
 #!/bin/bash
 
 repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --git-lfs
+rm -rf .repo/local_manifests
+git clone https://github.com/alternoegraha/local_manifest.git -b lineage-23-v .repo/local_manifests
 /opt/crave/resync.sh
 
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b lineage-23.0 device/xiaomi/tanzanite
@@ -19,5 +21,5 @@ rm -rf out/target
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-lunch lineage_tanzanite-bp2a-userdebug
+lunch lineage_tanzanite-bp2a-user
 mka bacon
