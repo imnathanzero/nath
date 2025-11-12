@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --git-lfs
-# /opt/crave/resync.sh
+repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --git-lfs
+/opt/crave/resync.sh
 
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b lineage-23.0 device/xiaomi/tanzanite
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite-kernel -b lineage-22.2-ksun device/xiaomi/tanzanite-kernel
