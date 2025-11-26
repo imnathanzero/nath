@@ -1,11 +1,9 @@
 #!/bin/bash
 
-repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --git-lfs
-rm -rf .repo/local_manifests
-git clone https://github.com/alternoegraha/local_manifest.git -b lineage-23-v .repo/local_manifests
+repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.0 --git-lfs
 /opt/crave/resync.sh
 
-git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b lineage-23.0 device/xiaomi/tanzanite
+git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b axion-16 device/xiaomi/tanzanite
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite-kernel -b lineage-22.2-ksun device/xiaomi/tanzanite-kernel
 git clone https://github.com/nathanzerogarage/proprietary_vendor_xiaomi_tanzanite -b lineage-23.0 vendor/xiaomi/tanzanite
 git clone https://github.com/TogoFire/packages_apps_ViPER4AndroidFX.git -b v4a packages/apps/ViPER4AndroidFX
@@ -21,5 +19,5 @@ rm -rf out/target
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-lunch lineage_tanzanite-bp2a-user
-mka bacon
+axion tanzanite userdebug vanilla
+ax -br
