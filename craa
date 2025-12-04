@@ -1,12 +1,12 @@
 #!/bin/bash
 
-repo init -u https://github.com/ProjectMatrixx/android.git -b 16.0 --git-lfs
+repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.0 --git-lfs
 /opt/crave/resync.sh
 
-rm -rf device/xiaomi/tanzanite;git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b lineage-23.0 device/xiaomi/tanzanite
+git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b axion-16 device/xiaomi/tanzanite
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite-kernel -b lineage-22.2-ksun device/xiaomi/tanzanite-kernel
-rm -rf vendor/xiaomi/tanzanite;git clone https://github.com/nathanzerogarage/proprietary_vendor_xiaomi_tanzanite -b lineage-23.0 vendor/xiaomi/tanzanite
-git clone https://github.com/AxionAOSP/android_packages_apps_ViPER4AndroidFX.git -b v4a packages/apps/ViPER4AndroidFX
+git clone https://github.com/nathanzerogarage/proprietary_vendor_xiaomi_tanzanite -b lineage-23.0 vendor/xiaomi/tanzanite
+git clone https://github.com/TogoFire/packages_apps_ViPER4AndroidFX.git -b v4a packages/apps/ViPER4AndroidFX
 git clone https://github.com/nathanzerogarage/android_hardware_xiaomi -b lineage-23.0 hardware/xiaomi
 git clone https://github.com/nathanzerogarage/android_hardware_mediatek -b lineage-23.0 hardware/mediatek
 git clone https://github.com/nathanzerogarage/android_device_mediatek_sepolicy_vndr -b lineage-23.0 device/mediatek/sepolicy_vndr
@@ -14,20 +14,10 @@ git clone https://github.com/MillenniumOSS/android_vendor_mediatek_ims.git -b si
 
 rm -rf out/target
 
-echo '<?xml version="1.0" encoding="utf-8"?>
-<!--
-     Copyright (C) 2025 Project Matrixx
-     SPDX-License-Identifier: Apache-2.0
--->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- Android version screen, build maintainer -->
-    <string name="matrixx_maintainer">6E617468616E</string>
-</resources>' > device/xiaomi/tanzanite/overlays/SettingsResOverlay/res/values/strings.xml
-
-
 . build/env*
 
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-brunch tanzanite userdebug
+axion tanzanite userdebug vanilla
+ax -br
