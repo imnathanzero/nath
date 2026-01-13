@@ -1,16 +1,16 @@
 #!/bin/bash
 
-repo init -u https://github.com/laineageos/android.git -b lineage-22.2 --git-lfs
+repo init -u https://github.com/crdroidandroid/android.git -b 16.0 --git-lfs --no-clone-bundle
 /opt/crave/resync.sh
 
-git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b lineage-22.2 device/xiaomi/tanzanite
-git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite-kernel -b lineage-22.2-ksu device/xiaomi/tanzanite-kernel
-git clone https://github.com/nathanzerogarage/proprietary_vendor_xiaomi_tanzanite -b lineage-22.2 vendor/xiaomi/tanzanite
+git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b lineage-23.1 device/xiaomi/tanzanite
+git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite-kernel -b ksu device/xiaomi/tanzanite-kernel
+git clone https://github.com/nathanzerogarage/proprietary_vendor_xiaomi_tanzanite -b lineage-23.1 vendor/xiaomi/tanzanite
 git clone https://github.com/TogoFire/packages_apps_ViPER4AndroidFX.git -b v4a packages/apps/ViPER4AndroidFX
-git clone https://github.com/nathanzerogarage/android_hardware_xiaomi -b lineage-22.2 hardware/xiaomi
-git clone https://github.com/nathanzerogarage/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
-git clone https://github.com/nathanzerogarage/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr
-# git clone https://github.com/MillenniumOSS/android_vendor_mediatek_ims.git -b sixteen vendor/mediatek/ims
+git clone https://github.com/nathanzerogarage/android_hardware_xiaomi -b lineage-23.1 hardware/xiaomi
+git clone https://github.com/nathanzerogarage/android_hardware_mediatek -b lineage-23.1 hardware/mediatek
+git clone https://github.com/nathanzerogarage/android_device_mediatek_sepolicy_vndr -b lineage-23.1 device/mediatek/sepolicy_vndr
+git clone https://github.com/MillenniumOSS/android_vendor_mediatek_ims.git -b sixteen vendor/mediatek/ims
 
 rm -rf out/target
 
@@ -19,5 +19,4 @@ rm -rf out/target
 export BUILD_USERNAME=nathan
 export TZ=Asia/Jakarta
 
-lunch lineage_tanzanite-bp1a-userdebug
-mka bacon
+brunch tanzanite user
