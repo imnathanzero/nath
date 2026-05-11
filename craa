@@ -9,7 +9,7 @@ git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite-kernel -b vanilla device/xiaomi/tanzanite-kernel
 git clone https://codeberg.org/nathannxx/proprietary_vendor_xiaomi_tanzanite.git -b sixteen-qpr2 vendor/xiaomi/tanzanite
 git clone https://github.com/halcyonproject/hardware_xiaomi.git -b 16.2 hardware/xiaomi
-git clone https://github.com/halcyonproject/android_hardware_mediatek -b 16.2 hardware/mediatek
+git clone https://github.com/halcyonproject/hardware_mediatek -b 16.2 hardware/mediatek
 git clone https://github.com/halcyonproject/device_mediatek_sepolicy_vndr -b 16.2 device/mediatek/sepolicy_vndr
 git clone https://git.hlcyn.org/halcyonlv/vendor_mediatek_ims.git -b 16.2 vendor/mediatek/ims
 rm -rf external/wpa_supplicant_8;git clone https://github.com/nathanzerogarage/android_external_wpa_supplicant_8.git -b lineage-23.2 external/wpa_supplicant_8
