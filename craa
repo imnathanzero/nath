@@ -3,7 +3,7 @@
 repo init -u https://github.com/cringe-stuff-at-2am/manifest.git -b lineage-23.2 --git-lfs
 /opt/crave/resync.sh
 
-rm -rf device/xiaomi/tanzanite
+rm -rf device/xiaomi/tanzanite device/xiaomi/tanzanite-kernel
 
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite -b staging device/xiaomi/tanzanite
 git clone https://github.com/nathanzerogarage/android_device_xiaomi_tanzanite-kernel -b staging device/xiaomi/tanzanite-kernel
