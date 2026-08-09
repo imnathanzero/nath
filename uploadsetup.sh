@@ -4,6 +4,7 @@ set -e
 
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
@@ -11,9 +12,25 @@ echo -e "${CYAN}===========================================${NC}"
 echo -e "${CYAN}        nxupl Auto-Installer               ${NC}"
 echo -e "${CYAN}===========================================${NC}"
 
-# 1. Detect Architecture and OS
-ARCH=$(uname -m)
-echo -e "${CYAN}[*] Detected Architecture:${NC} $ARCH"
+# Better sudo handling
+REAL_USER=${SUDO_USER:-$USER}
+if [ -z "$REAL_USER" ]; then REAL_USER=$(whoami); fi
+USER_HOME=$(eval echo ~$REAL_USER)
+
+IS_ROOT=0
+if [ "$(id -u)" -eq 0 ]; then IS_ROOT=1; fi
+
+HAS_SUDO=0
+if command -v sudo >/dev/null 2>&1; then HAS_SUDO=1; fi
+
+# Helper function to prevent files being trapped under 'root' ownership
+run_as_user() {
+    if [ $IS_ROOT -eq 1 ] && [ -n "$SUDO_USER" ]; then
+        sudo -u "$REAL_USER" "$@"
+    else
+        "$@"
+    fi
+}
 
 detect_os() {
     if [ -n "$TERMUX_VERSION" ] || [ -d "/data/data/com.termux" ]; then
@@ -27,76 +44,79 @@ detect_os() {
         echo "unknown"
     fi
 }
-
 OS=$(detect_os)
-echo -e "${CYAN}[*] Detected OS/Environment:${NC} $OS"
 
-SUDO=""
-if [ "$OS" != "termux" ] && [ "$(id -u)" -ne 0 ]; then
-    if command -v sudo >/dev/null 2>&1; then
-        SUDO="sudo"
+if [ "$OS" = "termux" ]; then
+    echo -e "${CYAN}[*] Detected Environment:${NC} Termux"
+    BIN_DIR="$PREFIX/bin"
+    PYTHON_BIN="python"
+    
+    echo -e "${CYAN}[*] Installing Termux dependencies...${NC}"
+    pkg update -y && pkg install -y python python-cryptography
+else
+    if [ $IS_ROOT -eq 1 ] || [ $HAS_SUDO -eq 1 ]; then
+        echo -e "${CYAN}[*] Admin privileges detected. Installing system dependencies...${NC}"
+        BIN_DIR="/usr/local/bin"
+        PYTHON_BIN="python3"
+        
+        SUDO_CMD=""
+        if [ $IS_ROOT -eq 0 ]; then SUDO_CMD="sudo"; fi
+        
+        case "$OS" in
+            debian|ubuntu|pop|mint|kali)
+                $SUDO_CMD apt update -y
+                $SUDO_CMD apt install -y python3 python3-venv python3-pip python3-cryptography
+                ;;
+            arch|manjaro|endeavouros)
+                $SUDO_CMD pacman -Sy --noconfirm python python-cryptography python-pip
+                ;;
+            fedora|rhel|centos|rocky|almalinux)
+                $SUDO_CMD dnf install -y python3 python3-pip python3-cryptography
+                ;;
+            alpine)
+                $SUDO_CMD apk add python3 py3-cryptography py3-pip
+                ;;
+            macos)
+                if ! command -v brew >/dev/null 2>&1; then
+                    echo -e "${RED}[!] Homebrew is required on macOS.${NC}"
+                    exit 1
+                fi
+                if [ $IS_ROOT -eq 1 ]; then
+                    sudo -u "$REAL_USER" brew install python
+                else
+                    brew install python
+                fi
+                BIN_DIR="$USER_HOME/.local/bin"
+                ;;
+        esac
+        
+        $SUDO_CMD mkdir -p "$BIN_DIR"
+    else
+        echo -e "${YELLOW}[*] Rootless Mode (No Sudo). Bypassing system package managers...${NC}"
+        BIN_DIR="$USER_HOME/.local/bin"
+        PYTHON_BIN="python3"
+        mkdir -p "$BIN_DIR"
     fi
 fi
 
-# 2. Package Management & System Dependencies
-echo -e "${CYAN}[*] Installing system dependencies...${NC}"
-
-case "$OS" in
-    termux)
-        pkg update -y
-        pkg install -y python python-cryptography
-        BIN_DIR="$PREFIX/bin"
-        PYTHON_BIN="python"
-        ;;
-    debian|ubuntu|pop|mint|kali)
-        $SUDO apt update -y
-        $SUDO apt install -y python3 python3-venv python3-pip python3-cryptography
-        BIN_DIR="/usr/local/bin"
-        PYTHON_BIN="python3"
-        ;;
-    arch|manjaro|endeavouros)
-        $SUDO pacman -Sy --noconfirm python python-cryptography python-pip
-        BIN_DIR="/usr/local/bin"
-        PYTHON_BIN="python3"
-        ;;
-    fedora|rhel|centos|rocky|almalinux)
-        $SUDO dnf install -y python3 python3-pip python3-cryptography
-        BIN_DIR="/usr/local/bin"
-        PYTHON_BIN="python3"
-        ;;
-    alpine)
-        $SUDO apk add python3 py3-cryptography py3-pip
-        BIN_DIR="/usr/local/bin"
-        PYTHON_BIN="python3"
-        ;;
-    macos)
-        if ! command -v brew >/dev/null 2>&1; then
-            echo -e "${RED}[!] Homebrew is required on macOS. Please install Homebrew first.${NC}"
-            exit 1
-        fi
-        brew install python
-        BIN_DIR="$HOME/.local/bin"
-        mkdir -p "$BIN_DIR"
-        PYTHON_BIN="python3"
-        ;;
-    *)
-        echo -e "${RED}[!] Unknown OS, falling back to local bin installation...${NC}"
-        BIN_DIR="$HOME/.local/bin"
-        mkdir -p "$BIN_DIR"
-        PYTHON_BIN="python3"
-        ;;
-esac
-
-# 3. Virtual Environment Setup
-VENV_DIR="$HOME/venv"
+# python venv Setup
+VENV_DIR="$USER_HOME/venv"
 echo -e "${CYAN}[*] Setting up virtual environment at $VENV_DIR...${NC}"
-$PYTHON_BIN -m venv "$VENV_DIR" --system-site-packages
+run_as_user $PYTHON_BIN -m venv "$VENV_DIR" --system-site-packages
 
-# 4. Deploy Main Script
-SCRIPT_PATH="$HOME/nxupl.py"
+# Helper function to write to system directories safely
+write_sys_file() {
+    if [ $IS_ROOT -eq 0 ] && [ "$BIN_DIR" = "/usr/local/bin" ]; then
+        sudo tee "$1" > /dev/null
+    else
+        cat > "$1"
+    fi
+}
+
+SCRIPT_PATH="$BIN_DIR/nxupl.py"
 echo -e "${CYAN}[*] Deploying nxupl script to $SCRIPT_PATH...${NC}"
 
-cat << 'PYEOF' > "$SCRIPT_PATH"
+cat << 'PYEOF' | write_sys_file "$SCRIPT_PATH"
 import os
 import sys
 import subprocess
@@ -136,6 +156,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from rich.progress import Progress, TextColumn, BarColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
+from prompt_toolkit.key_binding import KeyBindings, merge_key_bindings
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -153,7 +174,7 @@ GDRIVE_TOKEN = os.path.join(CONFIG_DIR, "gdrive_token.json")
 # ==========================================
 # TRANSLATIONS DICTIONARY
 # ==========================================
-LANG = "en" # Default
+LANG = "en"
 
 TRANSLATIONS = {
     "en": {
@@ -180,7 +201,7 @@ TRANSLATIONS = {
         "api_error": "API Error",
         "browser_target": "Target: {service}",
         "browser_curr_dir": "Current Directory: {current_dir}",
-        "browser_controls": "Controls: [SPACE] Select | [ENTER] Confirm",
+        "browser_controls": "Controls: [SPACE] Select | [ENTER] Confirm | [←/→] Back/Forward",
         "browser_title": "📁 nxupl File Browser",
         "browser_finish": "✅ [ FINISH & UPLOAD SELECTION ]",
         "browser_up": "🔙 [ Go Up / .. ]",
@@ -213,7 +234,7 @@ TRANSLATIONS = {
         "api_error": "API Error",
         "browser_target": "Target: {service}",
         "browser_curr_dir": "Direktori Saat Ini: {current_dir}",
-        "browser_controls": "Kontrol: [SPASI] Pilih | [ENTER] Konfirmasi",
+        "browser_controls": "Kontrol: [SPASI] Pilih | [ENTER] Konfirmasi | [←/→] Kembali/Maju",
         "browser_title": "📁 nxupl File Browser",
         "browser_finish": "✅ [ SELESAI & UPLOAD PILIHAN ]",
         "browser_up": "🔙 [ Naik / .. ]",
@@ -299,7 +320,7 @@ def interactive_file_picker(service_name):
                     checked=(full_path in global_selected)
                 ))
                 
-        answers = questionary.checkbox(
+        prompt = questionary.checkbox(
             t("browser_select"),
             choices=choices,
             style=questionary.Style([
@@ -308,7 +329,30 @@ def interactive_file_picker(service_name):
                 ('separator', 'fg:darkgray'),
             ]),
             qmark="👉"
-        ).ask()
+        )
+        
+        custom_kb = KeyBindings()
+        
+        @custom_kb.add('left')
+        def go_left(event):
+            event.app.exit(result=["UP"])
+            
+        @custom_kb.add('right')
+        def go_right(event):
+            try:
+                ic = event.app.layout.current_control
+                choice = ic.choices[ic.pointed_at]
+                if choice.value and isinstance(choice.value, str) and choice.value.startswith("DIR:"):
+                    event.app.exit(result=[choice.value])
+            except Exception:
+                pass 
+                
+        prompt.application.key_bindings = merge_key_bindings([
+            prompt.application.key_bindings, 
+            custom_kb
+        ])
+        
+        answers = prompt.ask()
         
         if answers is None: 
             console.print(f"\n[bold red]{t('cancelled')}[/bold red]")
@@ -574,15 +618,14 @@ if __name__ == "__main__":
         console.print(f"\n\n[bold red]{t('cancelled')}[/bold red]")
 PYEOF
 
-# 5. Create Executable Binary Launcher
+# Create Executable Binary Launcher
 WRAPPER_PATH="$BIN_DIR/nxupl"
 echo -e "${CYAN}[*] Installing global binary to $WRAPPER_PATH...${NC}"
 
-write_wrapper() {
-    cat << EOF
+cat << EOF | write_sys_file "$WRAPPER_PATH"
 #!/usr/bin/env bash
-VENV_PYTHON="$HOME/venv/bin/python"
-SCRIPT="$HOME/nxupl.py"
+VENV_PYTHON="$USER_HOME/venv/bin/python"
+SCRIPT="$SCRIPT_PATH"
 
 if [ ! -f "\$VENV_PYTHON" ]; then
     echo "Error: Virtual environment not found at \$VENV_PYTHON"
@@ -591,14 +634,20 @@ fi
 
 exec "\$VENV_PYTHON" "\$SCRIPT" "\$@"
 EOF
-}
 
-if [ "$OS" != "termux" ] && [ "$BIN_DIR" = "/usr/local/bin" ] && [ "$(id -u)" -ne 0 ]; then
-    write_wrapper | $SUDO tee "$WRAPPER_PATH" > /dev/null
-    $SUDO chmod +x "$WRAPPER_PATH"
+# Make files executable (using sudo if necessary)
+if [ $IS_ROOT -eq 0 ] && [ "$BIN_DIR" = "/usr/local/bin" ]; then
+    sudo chmod +x "$SCRIPT_PATH" "$WRAPPER_PATH"
 else
-    write_wrapper > "$WRAPPER_PATH"
-    chmod +x "$WRAPPER_PATH"
+    chmod +x "$SCRIPT_PATH" "$WRAPPER_PATH"
+fi
+
+# 6. PATH Verification Check (For Rootless Environments)
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+    echo -e "\n${RED}[!] ATTENTION: ${NC}$BIN_DIR is NOT in your current PATH."
+    echo -e "${YELLOW}To use the 'nxupl' command anywhere, run this command now:${NC}"
+    echo -e "export PATH=\"$BIN_DIR:\$PATH\""
+    echo -e "${YELLOW}(Add that line to your ~/.bashrc or ~/.zshrc to make it permanent)${NC}"
 fi
 
 echo -e "\n${GREEN}===========================================${NC}"
