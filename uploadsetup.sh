@@ -12,7 +12,15 @@ echo -e "${CYAN}===========================================${NC}"
 echo -e "${CYAN}        nxupl Auto-Installer               ${NC}"
 echo -e "${CYAN}===========================================${NC}"
 
-# Better sudo handling
+# 1. Argument Parsing
+SKIP_SUDO=0
+for arg in "$@"; do
+    if [ "$arg" == "--skip-sudo" ]; then
+        SKIP_SUDO=1
+    fi
+done
+
+# 2. Identity & Environment Setup
 REAL_USER=${SUDO_USER:-$USER}
 if [ -z "$REAL_USER" ]; then REAL_USER=$(whoami); fi
 USER_HOME=$(eval echo ~$REAL_USER)
@@ -23,7 +31,13 @@ if [ "$(id -u)" -eq 0 ]; then IS_ROOT=1; fi
 HAS_SUDO=0
 if command -v sudo >/dev/null 2>&1; then HAS_SUDO=1; fi
 
-# Helper function to prevent files being trapped under 'root' ownership
+# Override privileges if flag is passed
+if [ $SKIP_SUDO -eq 1 ]; then
+    echo -e "${YELLOW}[*] --skip-sudo flag passed. Forcing unprivileged Rootless Mode...${NC}"
+    IS_ROOT=0
+    HAS_SUDO=0
+fi
+
 run_as_user() {
     if [ $IS_ROOT -eq 1 ] && [ -n "$SUDO_USER" ]; then
         sudo -u "$REAL_USER" "$@"
@@ -46,13 +60,16 @@ detect_os() {
 }
 OS=$(detect_os)
 
+# 3. Package Management & Target Directories
 if [ "$OS" = "termux" ]; then
     echo -e "${CYAN}[*] Detected Environment:${NC} Termux"
     BIN_DIR="$PREFIX/bin"
     PYTHON_BIN="python"
     
-    echo -e "${CYAN}[*] Installing Termux dependencies...${NC}"
-    pkg update -y && pkg install -y python python-cryptography
+    if [ $SKIP_SUDO -eq 0 ]; then
+        echo -e "${CYAN}[*] Installing Termux dependencies...${NC}"
+        pkg update -y && pkg install -y python python-cryptography
+    fi
 else
     if [ $IS_ROOT -eq 1 ] || [ $HAS_SUDO -eq 1 ]; then
         echo -e "${CYAN}[*] Admin privileges detected. Installing system dependencies...${NC}"
@@ -92,19 +109,18 @@ else
         
         $SUDO_CMD mkdir -p "$BIN_DIR"
     else
-        echo -e "${YELLOW}[*] Rootless Mode (No Sudo). Bypassing system package managers...${NC}"
+        echo -e "${YELLOW}[*] Rootless Mode. Bypassing system package managers...${NC}"
         BIN_DIR="$USER_HOME/.local/bin"
         PYTHON_BIN="python3"
         mkdir -p "$BIN_DIR"
     fi
 fi
 
-# python venv Setup
+# 4. Virtual Environment Setup
 VENV_DIR="$USER_HOME/venv"
 echo -e "${CYAN}[*] Setting up virtual environment at $VENV_DIR...${NC}"
 run_as_user $PYTHON_BIN -m venv "$VENV_DIR" --system-site-packages
 
-# Helper function to write to system directories safely
 write_sys_file() {
     if [ $IS_ROOT -eq 0 ] && [ "$BIN_DIR" = "/usr/local/bin" ]; then
         sudo tee "$1" > /dev/null
@@ -113,6 +129,7 @@ write_sys_file() {
     fi
 }
 
+# 5. Deploy Main Script
 SCRIPT_PATH="$BIN_DIR/nxupl.py"
 echo -e "${CYAN}[*] Deploying nxupl script to $SCRIPT_PATH...${NC}"
 
@@ -144,7 +161,22 @@ def ensure_dependencies():
             
     if missing:
         print(f"Installing missing Python modules: {', '.join(missing)}...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", *missing, "-q"])
+        pip_cmd = [sys.executable, "-m", "pip", "install", *missing, "-q"]
+        
+        # Ubuntu 24.04+ PEP-668 Externally Managed Bypass
+        try:
+            if os.path.exists('/etc/os-release'):
+                with open('/etc/os-release', 'r') as f:
+                    os_data = f.read()
+                if 'ID=ubuntu' in os_data:
+                    import re
+                    v_match = re.search(r'VERSION_ID="?(\d+\.\d+)"?', os_data)
+                    if v_match and float(v_match.group(1)) >= 24.04:
+                        pip_cmd.append("--break-system-packages")
+        except Exception:
+            pass
+            
+        subprocess.check_call(pip_cmd)
         os.system('cls' if os.name == 'nt' else 'clear')
 
 ensure_dependencies()
@@ -618,7 +650,7 @@ if __name__ == "__main__":
         console.print(f"\n\n[bold red]{t('cancelled')}[/bold red]")
 PYEOF
 
-# Create Executable Binary Launcher
+# 6. Create Executable Binary Launcher
 WRAPPER_PATH="$BIN_DIR/nxupl"
 echo -e "${CYAN}[*] Installing global binary to $WRAPPER_PATH...${NC}"
 
@@ -642,7 +674,7 @@ else
     chmod +x "$SCRIPT_PATH" "$WRAPPER_PATH"
 fi
 
-# 6. PATH Verification Check (For Rootless Environments)
+# 7. PATH Verification Check (For Rootless Environments)
 if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
     echo -e "\n${RED}[!] ATTENTION: ${NC}$BIN_DIR is NOT in your current PATH."
     echo -e "${YELLOW}To use the 'nxupl' command anywhere, run this command now:${NC}"
