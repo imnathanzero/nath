@@ -1,0 +1,30 @@
+# Copy this file to: ~/.config/nxupl/nxupl.conf
+# Fill in only the services you plan to use.
+
+# --- Telegram (user account via MTProto/Telethon, ~2GB/4GB Premium limit) ---
+# Get API_ID and API_HASH by logging in at https://my.telegram.org -> API development tools.
+# This logs in as YOUR account (not a bot), so the first run will ask for your
+# phone number + login code (+ 2FA password if set), then save a session file.
+TELEGRAM_API_ID=
+TELEGRAM_API_HASH=
+# Where to send files: "me" = your own Saved Messages, or a @username, or a chat ID
+TELEGRAM_USER_CHAT=me
+# Session filename, stored in ~/.config/nxupl/ (change if you want multiple accounts)
+TELEGRAM_SESSION_NAME=nxupl_session
+
+# --- Gofile (optional) ---
+# Leave blank for anonymous uploads. Set GOFILE_TOKEN for uploads tied
+# to your Gofile account (from https://gofile.io/myProfile).
+GOFILE_TOKEN=
+GOFILE_FOLDER_ID=
+
+# --- Pixeldrain (optional) ---
+# Leave blank for anonymous uploads. Set for uploads tied to your account
+# (API key from https://pixeldrain.com/user/api_keys).
+PIXELDRAIN_API_KEY=
+
+# --- Google Drive (via rclone) ---
+# Name of the rclone remote you configured with `rclone config` (type: drive).
+GDRIVE_REMOTE=gdrive
+# Optional subfolder path within Drive to upload into (blank = root).
+GDRIVE_FOLDER=
