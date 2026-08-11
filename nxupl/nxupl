@@ -1,0 +1,315 @@
+#!/usr/bin/env bash
+#
+# nxupl — Upload files to Google Drive, Gofile, Pixeldrain, or Telegram
+# Works on regular Linux and Termux (Android).
+#
+# Run setup.sh first to install dependencies.
+#
+# Usage:
+#   nxupl <service> <file> [options]
+#
+# Services:
+#   gdrive      Upload to Google Drive (via rclone)
+#   gofile      Upload to gofile.io
+#   pixeldrain  Upload to pixeldrain.com
+#   telegram    Upload via Telegram user account (MTProto/Telethon).
+#               Supports files up to ~2GB (4GB Premium) and will
+#               interactively ask if you want to attach a thumbnail.
+#
+# Config:
+#   Copy nxupl.conf.example to ~/.config/nxupl/nxupl.conf and fill in
+#   your tokens/IDs. Or export the same variables in your shell before running.
+#
+# Examples:
+#   nxupl gofile movie.mkv
+#   nxupl pixeldrain photo.png
+#   nxupl telegram document.pdf
+#   nxupl gdrive backup.zip --folder MyBackups
+#
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Setup / config
+# ---------------------------------------------------------------------------
+
+SCRIPT_NAME="nxupl"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nxupl"
+CONFIG_FILE="$CONFIG_DIR/nxupl.conf"
+
+# Colors (disabled if not a terminal)
+if [ -t 1 ]; then
+    C_RESET='\033[0m'; C_RED='\033[0;31m'; C_GREEN='\033[0;32m'
+    C_YELLOW='\033[0;33m'; C_BLUE='\033[0;34m'; C_BOLD='\033[1m'
+else
+    C_RESET=''; C_RED=''; C_GREEN=''; C_YELLOW=''; C_BLUE=''; C_BOLD=''
+fi
+
+log()  { echo -e "${C_BLUE}[*]${C_RESET} $*"; }
+ok()   { echo -e "${C_GREEN}[+]${C_RESET} $*"; }
+warn() { echo -e "${C_YELLOW}[!]${C_RESET} $*"; }
+err()  { echo -e "${C_RED}[-]${C_RESET} $*" >&2; }
+die()  { err "$*"; exit 1; }
+
+# Detect Termux
+IS_TERMUX=false
+if [ -n "${PREFIX:-}" ] && [[ "$PREFIX" == *"com.termux"* ]]; then
+    IS_TERMUX=true
+fi
+
+# Load config file if present (create dir/example on first run)
+mkdir -p "$CONFIG_DIR"
+if [ -f "$CONFIG_FILE" ]; then
+    # shellcheck disable=SC1090
+    source "$CONFIG_FILE"
+fi
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+require_cmd() {
+    command -v "$1" >/dev/null 2>&1 || die "Required command '$1' not found. $2"
+}
+
+human_size() {
+    local bytes=$1
+    if command -v numfmt >/dev/null 2>&1; then
+        numfmt --to=iec-i --suffix=B "$bytes" 2>/dev/null || echo "${bytes}B"
+    else
+        echo "${bytes}B"
+    fi
+}
+
+# Copy a string to clipboard if possible (Termux or xclip/wl-copy/pbcopy)
+copy_to_clipboard() {
+    local text="$1"
+    if $IS_TERMUX && command -v termux-clipboard-set >/dev/null 2>&1; then
+        termux-clipboard-set "$text"
+        ok "Link copied to clipboard"
+    elif command -v xclip >/dev/null 2>&1; then
+        printf '%s' "$text" | xclip -selection clipboard
+        ok "Link copied to clipboard"
+    elif command -v wl-copy >/dev/null 2>&1; then
+        printf '%s' "$text" | wl-copy
+        ok "Link copied to clipboard"
+    elif command -v pbcopy >/dev/null 2>&1; then
+        printf '%s' "$text" | pbcopy
+        ok "Link copied to clipboard"
+    fi
+}
+
+notify() {
+    local title="$1" body="$2"
+    if $IS_TERMUX && command -v termux-notification >/dev/null 2>&1; then
+        termux-notification --title "$title" --content "$body" >/dev/null 2>&1 || true
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Uploaders
+# ---------------------------------------------------------------------------
+
+upload_gofile() {
+    local file="$1"
+    require_cmd curl "Install with: pkg install curl (Termux) or apt install curl"
+    require_cmd jq "Install with: pkg install jq (Termux) or apt install jq"
+
+    log "Finding best Gofile server..."
+    local server
+    server=$(curl -sf "https://api.gofile.io/servers" | jq -r '.data.servers[0].name')
+    [ -n "$server" ] && [ "$server" != "null" ] || die "Could not get Gofile upload server"
+
+    log "Uploading to Gofile server '$server'..."
+    local extra_args=()
+    [ -n "${GOFILE_TOKEN:-}" ] && extra_args+=(-F "token=$GOFILE_TOKEN")
+    [ -n "${GOFILE_FOLDER_ID:-}" ] && extra_args+=(-F "folderId=$GOFILE_FOLDER_ID")
+
+    local response
+    response=$(curl -# -f \
+        -F "file=@${file}" \
+        "${extra_args[@]}" \
+        "https://${server}.gofile.io/uploadFile")
+
+    local status link
+    status=$(echo "$response" | jq -r '.status')
+    if [ "$status" != "ok" ]; then
+        die "Gofile upload failed: $(echo "$response" | jq -r '.status // .data')"
+    fi
+    link=$(echo "$response" | jq -r '.data.downloadPage')
+    ok "Uploaded: $link"
+    copy_to_clipboard "$link"
+    notify "Upload complete" "Gofile: $link"
+}
+
+upload_pixeldrain() {
+    local file="$1"
+    require_cmd curl "Install with: pkg install curl (Termux) or apt install curl"
+    require_cmd jq "Install with: pkg install jq (Termux) or apt install jq"
+
+    local filename
+    filename=$(basename "$file")
+
+    log "Uploading '$filename' to Pixeldrain..."
+    local response
+    if [ -n "${PIXELDRAIN_API_KEY:-}" ]; then
+        response=$(curl -# -f \
+            -u ":${PIXELDRAIN_API_KEY}" \
+            -T "$file" \
+            "https://pixeldrain.com/api/file/${filename}")
+    else
+        response=$(curl -# -f \
+            -T "$file" \
+            "https://pixeldrain.com/api/file/${filename}")
+    fi
+
+    local id link
+    id=$(echo "$response" | jq -r '.id // empty')
+    [ -n "$id" ] || die "Pixeldrain upload failed: $response"
+    link="https://pixeldrain.com/u/${id}"
+    ok "Uploaded: $link"
+    copy_to_clipboard "$link"
+    notify "Upload complete" "Pixeldrain: $link"
+}
+
+upload_telegram() {
+    local file="$1"
+    require_cmd python3 "Install with: setup.sh (or manually: pkg/apt install python3)"
+
+    local helper="$SCRIPT_DIR/nxtgup.py"
+    [ -f "$helper" ] || die "nxtgup.py not found next to this script ($SCRIPT_DIR)"
+
+    [ -n "${TELEGRAM_API_ID:-}" ] || die "TELEGRAM_API_ID not set. Get one from https://my.telegram.org and add it to $CONFIG_FILE"
+    [ -n "${TELEGRAM_API_HASH:-}" ] || die "TELEGRAM_API_HASH not set. Get one from https://my.telegram.org and add it to $CONFIG_FILE"
+    [ -n "${TELEGRAM_USER_CHAT:-}" ] || die "TELEGRAM_USER_CHAT not set (use 'me' for Saved Messages, or a @username/chat ID)."
+
+    log "Uploading via Telegram (supports files up to ~2GB / 4GB Premium)..."
+    export TELEGRAM_API_ID TELEGRAM_API_HASH TELEGRAM_USER_CHAT TELEGRAM_SESSION_NAME
+    python3 "$helper" "$file"
+    ok "Sent via Telegram"
+    notify "Upload complete" "Sent to Telegram"
+}
+
+upload_gdrive() {
+    local file="$1"
+    local folder="${GDRIVE_FOLDER:-}"
+    require_cmd rclone "Install with: pkg install rclone (Termux) or see https://rclone.org/install/. Then run: rclone config (name the remote 'gdrive')"
+
+    local remote="${GDRIVE_REMOTE:-gdrive}"
+    rclone listremotes | grep -q "^${remote}:$" || \
+        die "rclone remote '${remote}:' not configured. Run 'rclone config' first (see README)."
+
+    local dest="${remote}:${folder}"
+    log "Uploading to Google Drive (${dest})..."
+    rclone copy --progress "$file" "$dest"
+
+    local filename
+    filename=$(basename "$file")
+    log "Generating shareable link..."
+    local link
+    link=$(rclone link "${dest%/}/${filename}" 2>/dev/null || true)
+    if [ -n "$link" ]; then
+        ok "Uploaded: $link"
+        copy_to_clipboard "$link"
+        notify "Upload complete" "Google Drive: $link"
+    else
+        ok "Uploaded to Google Drive (could not auto-generate a public link; check sharing settings in Drive)."
+        notify "Upload complete" "Google Drive upload done"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+usage() {
+    cat <<EOF
+${C_BOLD}${SCRIPT_NAME}${C_RESET} — upload files to gdrive, gofile, pixeldrain, or telegram
+
+Usage:
+  $SCRIPT_NAME <service> <file> [options]
+
+Services:
+  gdrive         Upload to Google Drive (requires rclone configured)
+  gofile         Upload to gofile.io (no account required)
+  pixeldrain     Upload to pixeldrain.com
+  telegram       Send via Telegram (user account/MTProto, up to ~2GB, 4GB Premium)
+                 Interactively prompts to attach a thumbnail.
+
+Options:
+  --folder <name>   (gdrive only) Destination folder in Drive
+  -h, --help        Show this help
+
+Config file:
+  $CONFIG_FILE
+
+  Create it (see nxupl.conf.example) with any of:
+    TELEGRAM_API_ID=1234567                     # from my.telegram.org
+    TELEGRAM_API_HASH=abcdef123456...            # from my.telegram.org
+    TELEGRAM_USER_CHAT=me                        # 'me', @username, or chat ID
+    TELEGRAM_SESSION_NAME=nxupl_session          # optional
+    GOFILE_TOKEN=your-gofile-account-token      # optional
+    GOFILE_FOLDER_ID=your-folder-id             # optional
+    PIXELDRAIN_API_KEY=your-api-key             # optional, for account uploads
+    GDRIVE_REMOTE=gdrive                        # rclone remote name
+    GDRIVE_FOLDER=                              # optional subfolder path
+
+Examples:
+  $SCRIPT_NAME gofile movie.mkv
+  $SCRIPT_NAME pixeldrain photo.png
+  $SCRIPT_NAME telegram big_movie.mkv
+  $SCRIPT_NAME gdrive backup.zip --folder MyBackups
+
+First-time setup:
+  Run setup.sh to install dependencies and install nxupl itself
+  into ~/.local/bin (auto-installs deps with sudo/pkg unless you pass
+  --no-sudo, in which case it just checks what's already installed).
+EOF
+}
+
+main() {
+    [ $# -ge 1 ] || { usage; exit 1; }
+
+    case "$1" in
+        -h|--help) usage; exit 0 ;;
+    esac
+
+    [ $# -ge 2 ] || { err "Missing file argument."; usage; exit 1; }
+
+    local service="$1"
+    local file="$2"
+    shift 2
+
+    # Parse remaining options
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --folder)
+                GDRIVE_FOLDER="$2"
+                shift 2
+                ;;
+            *)
+                die "Unknown option: $1"
+                ;;
+        esac
+    done
+
+    [ -f "$file" ] || die "File not found: $file"
+
+    local size
+    size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+    log "File: $file ($(human_size "$size"))"
+
+    case "$service" in
+        gdrive)      upload_gdrive "$file" ;;
+        gofile)        upload_gofile "$file" ;;
+        pixeldrain)    upload_pixeldrain "$file" ;;
+        telegram)      upload_telegram "$file" ;;
+        *)
+            err "Unknown service: $service"
+            usage
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
