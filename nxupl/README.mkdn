@@ -1,0 +1,111 @@
+# nxupl
+
+A bash tool to upload files to **Google Drive**, **Gofile**, **Pixeldrain**, or **Telegram** — works on regular Linux and Termux.
+
+## Install & setup
+
+### Locally
+```bash
+./setup.sh
+```
+
+### Or via curl one-liner
+```bash
+curl -fsSL https://raw.githubusercontent.com/imnathanzero/nath/refs/heads/main/nxupl/setup.sh | bash
+```
+
+To pass flags through a pipe, use `bash -s --`:
+```bash
+curl -fsSL https://raw.githubusercontent.com/imnathanzero/nath/refs/heads/main/nxupl/setup.sh | bash -s -- --no-sudo
+```
+
+Either way, `setup.sh` will:
+- Detect Termux vs Linux
+- Install missing dependencies (`curl`, `jq`, `rclone`, `python3`, and the Python packages `telethon` + `Pillow`)
+- Install `nxupl` and `nxtgup.py` into **`~/.local/bin`**
+- Create `~/.config/nxupl/nxupl.conf` from the example (permissions locked to your user only)
+
+For the Python packages, it auto-adds pip's `--break-system-packages` flag **only** when you're on Ubuntu 24.04+ and *not* inside a virtual environment (that's the specific combo where pip otherwise refuses to install with an "externally managed environment" error). On any other distro, older Ubuntu, or inside a venv, it installs normally without that flag.
+
+By default it **auto-installs** anything missing:
+- On Linux, via `apt-get`, using `sudo` automatically if you're not root
+- On Termux, via `pkg` (which never needs/uses sudo)
+
+Pass **`--no-sudo`** (alias `--skip-sudo`) to skip all dependency installation and only check what's already present — `nxupl` still gets installed to `~/.local/bin` either way:
+
+```bash
+./setup.sh --no-sudo
+```
+
+If `~/.local/bin` isn't already on your `PATH`, the script will tell you and print the line to add to your shell config:
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+## Config
+
+Edit `~/.config/nxupl/nxupl.conf`:
+
+### Telegram setup
+Telegram uploads use your **real account** (MTProto, via [Telethon](https://docs.telethon.dev)) rather than a bot, giving a file size limit of **~2GB** (4GB with Telegram Premium).
+
+1. Go to https://my.telegram.org, log in, open **API development tools**, and create an app. Copy the **api_id** and **api_hash** into `TELEGRAM_API_ID` / `TELEGRAM_API_HASH`.
+2. Set `TELEGRAM_USER_CHAT` to `me` (Saved Messages), a `@username`, or a numeric chat ID.
+3. Run `nxupl telegram somefile.mkv` once. It'll interactively ask for your phone number, the login code Telegram texts/sends you, and your 2FA password if you have one. A session file is then saved to `~/.config/nxupl/` and you won't be prompted again.
+
+**Security note:** the session file is equivalent to being logged into your Telegram account — anyone with that file can access your account without a password. `setup.sh` locks `~/.config/nxupl/` to `700` permissions; don't share or back up the session file insecurely.
+
+#### Thumbnails
+Every `nxupl telegram` upload interactively asks:
+```
+[?] Attach a custom thumbnail for this upload? [y/N]:
+```
+Say yes and give a path to an image (JPEG recommended, ≤200KB, ≤320x320px — Telegram's own limits). The script warns if your image doesn't fit those bounds but still lets you try. To skip the prompt when calling the Python helper directly:
+- `--no-thumbnail` — skip and upload without one
+- `--thumbnail /path/to/image.jpg` — use one without being asked
+
+```bash
+python3 ~/.local/bin/nxtgup.py video.mkv --thumbnail cover.jpg
+```
+(`nxupl telegram <file>` always uses the interactive prompt since that's its whole point — call `nxtgup.py` directly for non-interactive/scripted behavior.)
+
+### Gofile / Pixeldrain
+Work anonymously with no setup. Add `GOFILE_TOKEN` / `PIXELDRAIN_API_KEY` only if you want uploads tied to your account (so you can manage/delete them later).
+
+### Google Drive setup (via rclone)
+```bash
+rclone config
+# n) New remote
+# name> gdrive
+# Storage> drive (search "Google Drive")
+# client_id / client_secret> leave blank to use rclone's default
+# scope> 1 (full access) or 2 (read/write to files rclone creates)
+# Follow the browser auth flow (rclone gives you a link + code for headless setups like Termux)
+```
+On Termux (no browser), choose "No" when asked to auto-open a browser, then run the given `rclone authorize "drive"` command on a machine that does have a browser, and paste the resulting token back in.
+
+## Usage
+
+```bash
+nxupl gofile movie.mkv
+nxupl pixeldrain photo.png
+nxupl telegram big_movie.mkv
+nxupl gdrive backup.zip --folder MyBackups
+```
+
+Each successful upload prints the resulting link and (if `xclip`/`wl-copy`/`pbcopy`/`termux-clipboard-set` is available) copies it to your clipboard. On Termux with `termux-api` installed (`pkg install termux-api` + the Termux:API app), you'll also get a notification.
+
+## Files
+| File | Purpose |
+|---|---|
+| `nxupl` | Main command, installed to `~/.local/bin/nxupl` |
+| `nxtgup.py` | Telegram upload helper (Telethon), installed alongside `nxupl` |
+| `setup.sh` | One-time setup: deps + install + config. Local or curl-piped. |
+| `nxupl.conf.example` | Template for `~/.config/nxupl/nxupl.conf` |
+
+## Notes
+- Telegram uploads go through your own account, not a bot, so there's no 50MB bot cap — the practical ceiling is Telegram's own ~2GB (4GB Premium) per-file limit.
+- Gofile/Pixeldrain anonymous uploads may be auto-deleted after a period of inactivity — check their current retention policies if that matters to you.
+- `rclone link` requires the file/folder to be shareable; if your Drive is a shared drive with restricted sharing, you may need to open the file in Drive and share manually.
+- `setup.sh` only automates dependency installation for apt-based Linux distros and Termux. On other distros, install `curl`, `jq`, `rclone`, `python3`, `telethon`, and `Pillow` manually, then run `setup.sh --no-sudo` to finish install/config.
+- If you host these files for the curl one-liner, remember `nxupl.conf.example` will be publicly downloadable too — don't put real secrets in it, only the example is meant to be public.
