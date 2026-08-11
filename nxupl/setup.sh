@@ -32,7 +32,7 @@ set -euo pipefail
 # (e.g. when this script is piped in via curl). Override by exporting
 # NXUPL_REPO_RAW before running, or edit the default below to point at
 # wherever you host these files (e.g. a GitHub raw URL).
-NXUPL_REPO_RAW="${NXUPL_REPO_RAW:-https://raw.githubusercontent.com/imnathanzero/nath/nxupl/main}"
+NXUPL_REPO_RAW="${NXUPL_REPO_RAW:-https://raw.githubusercontent.com/imnathanzero/nath/refs/heads/main/nxupl}"
 
 # When run locally this resolves to the real directory; when piped via
 # `curl ... | bash` there's no real script file on disk, so this may
